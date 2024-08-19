@@ -74,7 +74,18 @@ class Sun(SolarSystemBody):
         self.color("yellow")
 
 class Planet(SolarSystemBody):
-    ...
+    colours = itertools.cycle(["red", "green", "blue"])
+    def __init__(
+            self,
+            solar_system,
+            mass,
+            position=(0, 0),
+            velocity=(0, 0),
+    ):
+        super().__init__(solar_system, mass, position, velocity)
+        self.color(next(Planet.colours))
+
+
 # Solar System
 class SolarSystem:
     def __init__(self, width, height):
@@ -106,3 +117,38 @@ class SolarSystem:
     # Turtle update() redraws all items on the screen.  
         self.solar_system.update()
 
+#    Gravitational Pull
+
+    @staticmethod
+    def accelerate_due_to_gravity(
+            first: SolarSystemBody,
+            second: SolarSystemBody,
+    ):
+        # Turtle method distance in pixels
+        force = first.mass * second.mass / first.distance(second) ** 2
+        # Turtle methods returns angle in degress
+        angle = first.towards(second)
+        # The acceleration changes sign between the two bodies as the bodies 
+        # accelerate towards each other. 
+        # The reverse variable achieves this.
+
+        reverse = 1
+        for body in first, second:
+            # acceleration measred in pixels/frames**2
+            acceleration = force / body.mass
+            acc_x = acceleration * math.cos(math.radians(angle))
+            acc_y = acceleration * math.sin(math.radians(angle))
+            # velocity measured in pixels/frame
+            body.velocity = (
+                body.velocity[0] + (reverse * acc_x),
+                body.velocity[1] + (reverse * acc_y),
+            )
+            print(reverse,body.velocity)
+            reverse = -1
+
+    # check for collisions - remove object
+    def check_collision(self, first, second):
+        if first.distance(second) < first.display_size/2 + second.display_size/2:
+            for body in first, second:
+                if isinstance(body, Planet):
+                    self.remove_body(body)
