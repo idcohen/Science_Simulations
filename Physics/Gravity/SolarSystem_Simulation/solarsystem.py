@@ -1,7 +1,7 @@
 # solarsystem.py
 import turtle
 import math
-
+import itertools # use cycle to iterate through planet colors
 
 # Displaying the bodies
 # Now, you can create another method to draw the sun or planet. 
@@ -46,8 +46,19 @@ class SolarSystemBody(turtle.Turtle):
     # The draw() method uses dot() from the turtle module to draw a dot of the 
     # required size.
     def draw(self):
+        # Turtle method that clears the previous drawing before redrawing the body
+        self.clear()         
         self.dot(self.display_size)
 
+    # move() method to SolarSystemBody. 
+    # Any movement is made up of a component along the x-axis and another along the 
+    # y-axis. There are two pairs of turtle methods that will be useful:
+
+    # setx() and sety() change the x– and y-coordinates of the Turtle object
+    # xcor() and ycor() return the current x– and y-coordinates of the Turtle object
+    def move(self):
+        self.setx(self.xcor() + self.velocity[0])
+        self.sety(self.ycor() + self.velocity[1])
 
 # draw the sun
 class Sun(SolarSystemBody):
@@ -84,4 +95,14 @@ class SolarSystem:
     def remove_body(self, body):
         self.bodies.remove(body)
 
+    # The update_all() method goes through all the solar system bodies 
+    # stored in the bodies attribute. It moves and draws them all. 
+    # Finally, it calls the 
+
+    def update_all(self):
+        for body in self.bodies:
+            body.move()
+            body.draw()
+    # Turtle update() redraws all items on the screen.  
+        self.solar_system.update()
 
