@@ -10,7 +10,7 @@ planet = Planet(
     solar_system,
     mass=1,
     position=(-350, 0),
-    velocity=(0, 4)
+    velocity=(0, 3)
 )
 
 # Turtle done() method keeps the display window open
@@ -18,4 +18,5 @@ planet = Planet(
 
 while True:
     solar_system.accelerate_due_to_gravity(sun, planet)
+    solar_system.check_collision(sun, planet)
     solar_system.update_all()

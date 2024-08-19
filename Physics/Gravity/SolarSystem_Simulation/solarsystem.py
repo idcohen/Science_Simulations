@@ -17,7 +17,7 @@ import itertools # use cycle to iterate through planet colors
 
 # Solar System Bodies
 class SolarSystemBody(turtle.Turtle):
-    min_display_size = 20
+    min_display_size = 10
     display_log_base = 1.1
     def __init__(
             self,
@@ -74,7 +74,7 @@ class Sun(SolarSystemBody):
         self.color("yellow")
 
 class Planet(SolarSystemBody):
-    colours = itertools.cycle(["red", "green", "blue"])
+    colours = itertools.cycle(["red", "green", "blue","orange"])
     def __init__(
             self,
             solar_system,
@@ -97,6 +97,7 @@ class SolarSystem:
         self.solar_system.setup(width, height)
         # background color
         self.solar_system.bgcolor("black")
+        self.solar_system.title('Solar System Simulation')
         # list of bodies
         self.bodies = []
 
@@ -104,6 +105,7 @@ class SolarSystem:
         self.bodies.append(body)
 
     def remove_body(self, body):
+        self.body.clear() # remove image
         self.bodies.remove(body)
 
     # The update_all() method goes through all the solar system bodies 
@@ -116,6 +118,7 @@ class SolarSystem:
             body.draw()
     # Turtle update() redraws all items on the screen.  
         self.solar_system.update()
+       # self.solar_system.exitonclick()
 
 #    Gravitational Pull
 
@@ -143,12 +146,33 @@ class SolarSystem:
                 body.velocity[0] + (reverse * acc_x),
                 body.velocity[1] + (reverse * acc_y),
             )
-            print(reverse,body.velocity)
             reverse = -1
 
     # check for collisions - remove object
     def check_collision(self, first, second):
+        # if two planets overlap
+        if isinstance(first, Planet) and isinstance(second, Planet):
+            return
         if first.distance(second) < first.display_size/2 + second.display_size/2:
             for body in first, second:
                 if isinstance(body, Planet):
                     self.remove_body(body)
+
+# You can loop through the list stored in the solar system’s bodies attribute. 
+# For each body in this list, you can account for the interaction between this 
+# body and all the bodies that come after it in the list. By only considering 
+# interactions with bodies that come later on in the list, you’re ensuring you 
+# don’t account for the same interactions twice:
+
+# You’re creating a copy of self.bodies since the method check_collision() 
+# can remove items from the list, and therefore, you shouldn’t iterate through 
+# a list that can change while the loop is running. In the inner loop, you’re 
+# iterating through the part of the list that comes after the current item 
+# using the slice [idx + 1:].
+
+    def calculate_all_body_interactions(self):
+        bodies_copy = self.bodies.copy()
+        for idx, first in enumerate(bodies_copy):
+            for second in bodies_copy[idx + 1:]:
+                self.accelerate_due_to_gravity(first, second)
+                self.check_collision(first, second)
